@@ -8,6 +8,7 @@
 #ifndef SCREEN_H_
 #define SCREEN_H_
 
+//#define __cplusplus
 #ifdef __cplusplus
 
 #include <stdint.h>

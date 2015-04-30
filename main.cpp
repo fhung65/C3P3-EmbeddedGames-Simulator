@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 {
     TVOut_Init();
     SDL_Window* window;
-    compat_disp_interface = SDL_DisplayInterface::createWindow(FB_WIDTH, FB_HEIGHT, window, 4);
+    compat_disp_interface = SDL_DisplayInterface::createWindow(FB_WIDTH, FB_HEIGHT, window, 2);
 
     SDL_SetHintWithPriority(SDL_HINT_RENDER_VSYNC, "1", SDL_HINT_OVERRIDE);
 
