@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include "../utils/VectorLib/Vector.h"
 
+
 typedef int32_t screen_coord_t;
 
 enum Color_t
@@ -32,6 +33,26 @@ enum Bitmap_mode_t
 	MODE_MASK_INVERT,
 	MODE_INVERT,
 	MODE_INVERT_INVERT
+};
+
+enum Font_anchor_pos_t
+{
+    FAP_TOP_LEFT,
+    FAP_TOP_RIGHT,
+    FAP_TOP_CENTER,
+    FAP_LEFT_CENTER,
+    FAP_RIGHT_CENTER,
+    FAP_BOTTOM_LEFT,
+    FAP_BOTTOM_RIGHT,
+    FAP_BOTTOM_CENTER,
+    FAP_CENTER
+};
+
+enum Font_justification_t
+{
+    FJ_LEFT,
+    FJ_RIGHT,
+    FJ_CENTER
 };
 
 struct Bitmap_t
@@ -68,7 +89,7 @@ struct Point_t
         y = _y;
     }
 
-    Point_t operator+(const Point_t& other)
+    Point_t operator+(const Point_t& other) const
     {
         Point_t ret;
         ret.x = x + other.x;
@@ -76,12 +97,24 @@ struct Point_t
         return ret;
     }
 
-    Point_t operator-(const Point_t& other)
+    Point_t operator-(const Point_t& other) const
     {
         Point_t ret;
         ret.x = x - other.x;
         ret.y = y - other.y;
         return ret;
+    }
+
+    void operator+=(const Point_t& other)
+    {
+        x += other.x;
+        y += other.y;
+    }
+
+    void operator-=(const Point_t& other)
+    {
+        x -= other.x;
+        y -= other.y;
     }
 
     Point_t operator*(int16_t scalar)
@@ -90,6 +123,11 @@ struct Point_t
         ret.x = x * scalar;
         ret.y = y * scalar;
         return ret;
+    }
+
+    bool operator==(const Point_t& other)
+    {
+        return (x == other.x && y == other.y);
     }
 
     void fromVector2d(const Vector2d& other)
@@ -118,11 +156,11 @@ struct Rect_t
         h = _h;
     }
 
-    Rect_t operator+(const Point_t& other)
+    Rect_t operator+(const Point_t& other) const
     {
         return Rect_t(other.x + x, other.y + y, w, h);
     }
-    Rect_t operator-(const Point_t& other)
+    Rect_t operator-(const Point_t& other) const
     {
         return Rect_t(other.x - x, other.y - y, w, h);
     }
@@ -158,18 +196,25 @@ struct Rect_t
     {
         return Point_t(x+w/2,y+h/2);
     }
+
+    void centerOn(const Point_t& cent)
+    {
+        operator+=(cent - center());
+    }
 };
 
 struct Font_t
 {
-    Bitmap_t* bitmap;
+    const Bitmap_t* bitmap;
     uint8_t char_width;
     uint8_t char_height;
     uint8_t char_stride;
     uint8_t char_kerning;
+    uint8_t char_vstride;
+    uint8_t char_hstride;
     uint8_t (*char_mapping)(uint8_t);
 
-    Font_t(Bitmap_t* fb, uint8_t w, uint8_t h, uint8_t s, uint8_t k, uint8_t (*m)(uint8_t))
+    Font_t(const Bitmap_t* fb, uint8_t w, uint8_t h, uint8_t s, uint8_t k, uint8_t (*m)(uint8_t))
     {
         bitmap = fb;
         char_width = w;
@@ -177,8 +222,116 @@ struct Font_t
         char_stride = s;
         char_kerning = k;
         char_mapping = m;
+        char_vstride = (4 * char_height) / 3;
+        char_hstride = char_width + char_kerning;
+    }
+
+    static void textSize(const char* str, uint16_t *w, uint16_t *h)
+    {
+        if(!w || !h || !str)
+            return;
+
+        (*w) = 0;
+        (*h) = 0;
+
+        uint16_t maxw = 0;
+        char nextChar;
+        while(1)
+        {
+            nextChar = *str;
+
+            if(nextChar == '\n' || nextChar == '\0')
+            {
+                if(maxw > (*w))
+                    (*w) = maxw;
+                maxw = 0;
+                (*h)++;
+
+                if(nextChar == '\0')
+                {
+                    break;
+                }
+            }
+            else
+                maxw++;
+            str++;
+        }
+    }
+
+    void textSizePixels(const char* str, uint16_t *w, uint16_t *h) const
+    {
+        if(!w || !h || !str)
+            return;
+
+        Font_t::textSize(str, w, h);
+
+        if(*w)
+        {
+            (*w) *= char_hstride;
+            (*w) -= char_kerning;
+        }
+
+        if(*h)
+        {
+            (*h) *= char_vstride;
+            (*h) -= (char_vstride - char_height);
+        }
+    }
+
+    static void textSizeLen(const char* str, uint32_t strlen, uint16_t *w, uint16_t *h)
+    {
+        if(!w || !h || !str)
+            return;
+
+        (*w) = 0;
+        (*h) = 0;
+
+        uint16_t maxw = 0;
+        char nextChar;
+        while(strlen--)
+        {
+            nextChar = *str;
+
+            if(nextChar == '\n' || nextChar == '\0')
+            {
+                if(maxw > (*w))
+                    (*w) = maxw;
+                maxw = 0;
+                (*h)++;
+
+                if(nextChar == '\0')
+                {
+                    break;
+                }
+            }
+            else
+                maxw++;
+            str++;
+        }
+    }
+
+    void textSizePixelsLen(const char* str, uint32_t strlen, uint16_t *w, uint16_t *h) const
+    {
+        if(!w || !h || !str)
+            return;
+
+        Font_t::textSizeLen(str, strlen, w, h);
+
+        if(*w)
+        {
+            (*w) *= char_hstride;
+            (*w) -= char_kerning;
+        }
+
+        if(*h)
+        {
+            (*h) *= char_vstride;
+            (*h) -= (char_vstride - char_height);
+        }
     }
 };
+
+class BoxSprite_t;
 
 class Screen {
 protected:
@@ -236,8 +389,11 @@ public:
 	void bitmap_adj(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest, Bitmap_mode_t mode);
 
 	// Text
-	void text(Font_t& font, Point_t pt, const char* str, Bitmap_mode_t mode);
-	void text_plus_offset(Font_t& font, Point_t pt, const char* str, Point_t& (*posmod)(uint32_t charnum), Bitmap_mode_t mode);
+	void textOption(const Font_t& font, const Point_t& pt, const char* str, Font_anchor_pos_t fapos, Font_justification_t fjust, Bitmap_mode_t mode);
+	void textlen(const Font_t& font, const Point_t& pt, const char* str, uint32_t strlen, Bitmap_mode_t mode);
+	void text(const Font_t& font, const Point_t& pt, const char* str, Bitmap_mode_t mode);
+	void text_plus_offset(const Font_t& font, const Point_t& pt, const char* str, Point_t& (*posmod)(uint32_t charnum), Bitmap_mode_t mode);
+	void textBox(const char* str, const Font_t& font, const BoxSprite_t& border, const Point_t& pos, uint8_t margin, Bitmap_mode_t bordermode, Bitmap_mode_t textmode);
 
     // Transform blits
 	void bitmap_scaled_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * destRect, Bitmap_mode_t mode);
