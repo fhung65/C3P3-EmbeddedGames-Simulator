@@ -3,6 +3,7 @@
 #include "../gamelib/display/screen.h"
 
 
+#include "Object.h"
 
 
 class PhysOb
@@ -15,6 +16,8 @@ class PhysOb
     protected:
     private:
         int m_mass ;
+
+
         screen_coord_t m_x ;
         screen_coord_t m_y ;
 };
