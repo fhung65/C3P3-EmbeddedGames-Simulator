@@ -6,6 +6,8 @@ PhysOb::PhysOb()
     m_mass = 10 ;
     m_x = 0;
     m_y = 0;
+    v_x = 0;
+    v_y = 0;
 }
 
 PhysOb::PhysOb(screen_coord_t x, screen_coord_t y)
@@ -15,6 +17,8 @@ PhysOb::PhysOb(screen_coord_t x, screen_coord_t y)
     if ( 0 < y && y < screen.getHeight() )
         m_y = y;
 
+    v_x = 0;
+    v_y = 0;
     m_mass = 0 ;
 }
 
@@ -29,6 +33,8 @@ PhysOb::PhysOb(screen_coord_t x, screen_coord_t y, int mass)
         m_y = y;
     }
 
+    v_x = 0;
+    v_y = 0;
     // we'll see what negative mass does later
     m_mass = mass;
 }
