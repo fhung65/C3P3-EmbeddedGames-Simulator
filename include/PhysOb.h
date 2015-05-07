@@ -12,6 +12,7 @@ class PhysOb
     protected:
     private:
         int m_mass ;
+		
         screen_coord_t m_x ;
         screen_coord_t m_y ;
         screen_coord_t v_x ;
