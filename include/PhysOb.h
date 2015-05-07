@@ -2,11 +2,14 @@
 #define PHYSOB_H
 #include "../gamelib/display/screen.h"
 
+
+
+
 class PhysOb
 {
     public:
         PhysOb();
-        PhysOb(screen_coord_t x, screen_coord_t y) ;
+        PhysOb(screen_coord_t x, screen_coord_t y) ;//coordinates represent center
         PhysOb(screen_coord_t x, screen_coord_t y, int mass);
         virtual ~PhysOb();
     protected:
