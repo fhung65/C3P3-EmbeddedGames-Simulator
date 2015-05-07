@@ -9,6 +9,7 @@ class Object
         ~Object();
     protected:
     private:
+    //coordinates
 
 };
 

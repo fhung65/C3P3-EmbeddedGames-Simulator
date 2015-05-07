@@ -1,5 +1,5 @@
-#ifndef GRAVOBJ.H
-#define GRAVOBJ.H
+#ifndef GRAVOBJ_H
+#define GRAVOBJ_H
 /*
 *Objects that serve as gravity well
 *has mass and affects other objects with
