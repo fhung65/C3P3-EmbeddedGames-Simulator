@@ -28,20 +28,20 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-				</Linker>
+				<Add directory="/usr/lib" /> </Linker>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-std=c++11" />
 			<Add option="-Wall" />
-			<Add directory="../SDL2-2.0.3/i686-w64-mingw32/include" />
-		</Compiler>
+			<Add directory="../SDL2/include" />
+		<Add option="-pthread" /> <Add directory="/usr/include" /> </Compiler>
 		<Linker>
-			<Add option="-lmingw32 -lSDL2main -lSDL2" />
-			<Add library="..\SDL2-2.0.3\i686-w64-mingw32\lib\libSDL2.a" />
-			<Add library="..\SDL2-2.0.3\i686-w64-mingw32\lib\libSDL2main.a" />
-			<Add directory="../SDL2-2.0.3/i686-w64-mingw32/lib" />
-		</Linker>
+			<Add option="-lSDL2main -lSDL2 -ldl -lpthread" />
+			<Add library="../SDL2/libSDL2.a" />
+			<Add library="../SDL2/libSDL2main.a" />
+			<Add directory="../SDL2" />
+		<Add directory="/usr/lib" /> </Linker>
 		<Unit filename="bitmaps/arrow.cpp" />
 		<Unit filename="bitmaps/arrow.h" />
 		<Unit filename="bitmaps/border_bubble.c">
